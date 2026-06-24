@@ -1,0 +1,12 @@
+{
+    "name": "easy custom cards template mod",
+    "id": "EASY_CUSTOM_TEXTURES_TEMPLATE",
+    "version": "1.0",
+    "description": "hello world i am description",
+    "prefix": "kanner_EASY_CUSTOM_TEXTURES_TEMPLATE",
+    "author": [
+        "kanner"
+    ],
+    "main_file": "main.lua",
+	"display_card": "j_joker"
+}
