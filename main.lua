@@ -38,6 +38,29 @@ local function get_set(key)
     return "Joker"
 end
 
+local function get_display_name(card)
+    local loc_set_remap = { Booster = "Other", Seal = "Other", Sticker = "Other" }
+    local set_suffix    = { Seal = " Seal", Sticker = " Sticker" }
+
+    local loc_set = loc_set_remap[card.set] or card.set
+    local loc_entry = G.localization.descriptions[loc_set] and G.localization.descriptions[loc_set][card.base_key]
+    local base_name = loc_entry and loc_entry.name or key_to_name(card.base_key)
+
+    base_name = base_name .. (set_suffix[card.set] or "")
+
+    if card.variant_tag and card.variant_tag ~= "soul" then
+        local variant_label = card.variant_tag:gsub("^%l", string.upper)
+        return base_name .. " (" .. variant_label .. ")"
+    end
+    return base_name
+end
+
+local function get_frames(card)
+    if card.set ~= "Blind" then return nil end
+    if card.variant_tag == "static" then return 1 end
+    return 21
+end
+
 for _, file in ipairs(files) do
     if file:match("%.png$") then
         local atlas_key = file:sub(1, -5)
@@ -47,6 +70,7 @@ for _, file in ipairs(files) do
         local card_data = {
             atlas_key = atlas_key,
             base_key = actual_base,
+            variant_tag = variant_tag,
             file = file,
             set = get_set(actual_base)
         }
@@ -64,17 +88,18 @@ end
 
 for _, card in ipairs(base_cards) do
     local soul_file = soul_sprites[card.base_key]
-    
+
     AltTexture({
         key = card.atlas_key,
         set = card.set,
         path = card.file,
         keys = {card.base_key},
-        loc_txt = {name = key_to_name(card.atlas_key)},
+        loc_txt = {name = get_display_name(card)},
         soul = soul_file,
-        soul_keys = soul_file and {card.base_key} or nil
+        soul_keys = soul_file and {card.base_key} or nil,
+        frames = get_frames(card)
     })
-    
+
     table.insert(custom_cards, mod.prefix .. "_" .. card.atlas_key)
 end
 
@@ -84,7 +109,8 @@ for _, card in ipairs(variant_cards) do
         set = card.set,
         path = card.file,
         keys = {card.base_key},
-        loc_txt = {name = key_to_name(card.atlas_key)}
+        loc_txt = {name = get_display_name(card)},
+        frames = get_frames(card)
     })
     table.insert(custom_cards_alt, mod.prefix .. "_" .. card.atlas_key)
     table.insert(custom_cards, mod.prefix .. "_" .. card.atlas_key)
